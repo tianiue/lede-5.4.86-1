@@ -10,7 +10,7 @@ name: OpenWrt-old-docker
 
 on:
   repository_dispatch:
-  workflow_dispatch:
+  workflow_dispatch:old
   # schedule:
   #   - cron: 0 18 */3 * *
 
