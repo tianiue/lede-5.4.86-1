@@ -1,91 +1,94 @@
-#=================================================
-# https://github.com/P3TERX/Actions-OpenWrt
-# Description: Build OpenWrt using GitHub Actions
-# Lisence: MIT
-# Author: P3TERX
-# Blog: https://p3terx.com
-#=================================================
+#
+# This is free software, lisence use MIT.
+# 
+# Copyright (C) 2019 P3TERX <https://p3terx.com>
+# Copyright (C) 2020 KFERMercer <KFER.Mercer@gmail.com>
+# 
+# <https://github.com/KFERMercer/OpenWrt-CI>
+#
 
-name: OpenWrt-lede5.4.86docker
+name: OpenWrt-CI
 
 on:
-  repository_dispatch:
-  workflow_dispatch:
+  push:
+    branches: 
+      - old
   # schedule:
-  #   - cron: 0 18 */3 * *
-
-env:
-  UPLOAD_BIN_DIR: true
-  UPLOAD_FIRMWARE: true
-  UPLOAD_COWTRANSFER: true
-  UPLOAD_WETRANSFER: true
-  UPLOAD_RELEASE: true
-  TZ: Asia/Shanghai
+  #   - cron: 0 20 * * *
+  release:
+    types: [published]
 
 jobs:
-  build:
-    runs-on: ubuntu-18.04
+
+  build_openwrt:
+
+    name: Build OpenWrt firmware
+
+    runs-on: ubuntu-latest
+
+    if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
-    - name: 检查项目分支
-      uses: actions/checkout@main
 
-    - name: 安装编译环境
-      env:
-        DEBIAN_FRONTEND: noninteractive
-      run: |
-        sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc
-        sudo -E apt-get -qq update
-        sudo -E apt-get -qq install $(curl -fsSL git.io/depends-ubuntu-1804)
-        sudo -E apt-get -qq autoremove --purge
-        sudo -E apt-get -qq clean
-        sudo timedatectl set-timezone "$TZ"
-        sudo mkdir -p /workdir
-        sudo chown $USER:$GROUPS /workdir
-    - name: 下载固件源码
-      working-directory: /workdir
-      run: |
-        df -hT $PWD
-        ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
-        
-    - name: 加载自定义设置
-      run: |
-       cd package
-       mkdir openwrt-packages
-       cd openwrt-packages
-       git clone https://github.com/xiaorouji/openwrt-passwall.git
-       git clone https://github.com/kenzok8/openwrt-packages.git
-       git clone https://github.com/kenzok8/small.git
-       git clone https://github.com/destan19/OpenAppFilter.git
-       git clone https://github.com/vernesong/OpenClash.git
-       git clone https://github.com/schen39/luci-app-serverchan.git
-       git clone https://github.com/cqranjian/luci-app-kod.git
-       git clone https://github.com/cqranjian/luci-app-feixunchapai.git
-       git clone https://github.com/cqranjian/luci-app-pptp-vpnserver.git
-       # git clone https://github.com/cnzd/luci-app-koolproxyR.git
-       # git clone https://github.com/jerrykuku/luci-app-vssr.git
-       # git clone https://github.com/jerrykuku/lua-maxminddb.git
-       git clone https://github.com/lisaac/luci-app-dockerman.git
-       git clone https://github.com/lisaac/luci-lib-docker.git
-       git clone https://github.com/cqranjian/openwrtplugins.git
-       git clone https://github.com/riverscn/openwrt-iptvhelper.git
-    - name: 下载插件
-      run: ./scripts/feeds update -a
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          ref: old
 
-    - name: 读取插件
-      run: ./scripts/feeds install -a
+      - name: Space cleanup
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          docker rmi `docker images -q`
+          sudo rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d
+          sudo -E apt-get -y purge azure-cli ghc* zulu* hhvm llvm* firefox google* dotnet* powershell openjdk* mysql* php* android*
+          sudo -E apt-get update
+          sudo -E apt-get -y install build-essential asciidoc binutils bzip2 gawk gettext git libncurses5-dev libz-dev patch python3 unzip zlib1g-dev lib32gcc1 libc6-dev-i386 subversion flex uglifyjs gcc-multilib g++-multilib p7zip p7zip-full msmtp libssl-dev texinfo libglib2.0-dev xmlto qemu-utils upx libelf-dev autoconf automake libtool autopoint device-tree-compiler antlr3 gperf swig libtinfo5
+          sudo -E apt-get -y autoremove --purge
+          sudo -E apt-get clean
 
-    - name: 更改设置
-      run: |
-        sed -i 's/192.168.1.1/192.168.2.1/g' package/base-files/files/bin/config_generate
-        # 版本号里显示一个自己的名字（Lan build $(TZ=UTC-8 date "+%Y.%m.%d") @ 这些都是后增加的）
-        sed -i "s/OpenWrt /docker build $(TZ=UTC-8 date "+%Y%m%d") @ OpenWrt /g" package/lean/default-settings/files/zzz-default-settings
-    - name: 固件定制
-      run: |
+          # sudo mkdir -p -m 777 /mnt/openwrt/bin /mnt/openwrt/build_dir/host /mnt/openwrt/build_dir/hostpkg /mnt/openwrt/dl /mnt/openwrt/feeds /mnt/openwrt/staging_dir
+          # ln -s /mnt/openwrt/bin ./bin
+          # mkdir -p ./build_dir
+          # ln -s -f /mnt/openwrt/build_dir/host ./build_dir/host
+          # ln -s -f /mnt/openwrt/build_dir/hostpkg ./build_dir/hostpkg
+          # ln -s /mnt/openwrt/dl ./dl
+          # ln -s /mnt/openwrt/feeds ./feeds
+          # ln -s /mnt/openwrt/staging_dir ./staging_dir
+
+          df -h
+      - name: Custom plugin theme
+        run: |
+          cd package
+          mkdir openwrt-packages
+          cd openwrt-packages
+          git clone https://github.com/xiaorouji/openwrt-passwall.git
+          git clone https://github.com/kenzok8/openwrt-packages.git
+          git clone https://github.com/kenzok8/small.git
+          git clone https://github.com/destan19/OpenAppFilter.git
+          git clone https://github.com/vernesong/OpenClash.git
+          git clone https://github.com/schen39/luci-app-serverchan.git
+          git clone https://github.com/cqranjian/luci-app-kod.git
+          git clone https://github.com/cqranjian/luci-app-feixunchapai.git
+          git clone https://github.com/cqranjian/luci-app-pptp-vpnserver.git
+          # git clone https://github.com/cnzd/luci-app-koolproxyR.git
+          # git clone https://github.com/jerrykuku/luci-app-vssr.git
+          # git clone https://github.com/jerrykuku/lua-maxminddb.git
+          git clone https://github.com/lisaac/luci-app-dockerman.git
+          git clone https://github.com/lisaac/luci-lib-docker.git
+          git clone https://github.com/cqranjian/openwrtplugins.git
+          git clone https://github.com/riverscn/openwrt-iptvhelper.git
+      - name: Update feeds
+        run: |
+          ./scripts/feeds update -a
+          ./scripts/feeds install -a
+
+      - name: Generate configuration file
+        run: |
           rm -f ./.config*
           touch ./.config
 
-          #
+           #
           # ========================固件定制部分========================
           # 
 
@@ -140,7 +143,7 @@ jobs:
 
           # 编译UEFI固件:
           cat >> .config <<EOF
-          CONFIG_EFI_IMAGES=y
+          # CONFIG_EFI_IMAGES=y
           EOF
 
           # IPv6支持:
@@ -437,6 +440,7 @@ jobs:
           CONFIG_PACKAGE_luci-app-syncdial=y
           CONFIG_PACKAGE_luci-app-wrtbwmon=y
           CONFIG_PACKAGE_luci-app-dc1=y
+          CONFIG_PACKAGE_dc1=y
           CONFIG_PACKAGE_luci-app-iptvhelper=y
           CONFIG_PACKAGE_iptvhelper=y
           EOF
@@ -474,119 +478,56 @@ jobs:
           sed -i 's/^[ \t]*//g' ./.config
           make defconfig
 
-    - name: 下载安装包
-      id: package
-      run: |
-        make defconfig
-        make download -j8
-        find dl -size -1024c -exec ls -l {} \;
-        find dl -size -1024c -exec rm -f {} \;
-    - name: 开始编译固件
-      id: compile
-      run: |
-        echo -e "$(nproc) thread compile"
-        curl https://sc.ftqq.com/${{ secrets.SCKEY }}.send?text=开始编译LEDE5.4.86内核docker固件&desp=请等待。。。
-        make -j$(nproc) || make -j1 || make -j1 V=s
-        echo "::set-output name=status::success"
-        grep '^CONFIG_TARGET.*DEVICE.*=y' .config | sed -r 's/.*DEVICE_(.*)=y/\1/' > DEVICE_NAME
-        [ -s DEVICE_NAME ] && echo "DEVICE_NAME=_$(cat DEVICE_NAME)" >> $GITHUB_ENV
-        echo "FILE_DATE=_$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-        echo "FILE_TIME=$(date "+%Y年%m月%d日-%H点")" >> $GITHUB_ENV
-    - name: 查看磁盘使用情况
-      if: (!cancelled())
-      run: df -hT
+      - name: Make download
+        run: |
+          make download -j8 || make download -j1 V=s
+          rm -rf $(find ./dl/ -size -1024c)
+          df -h
 
-    - name: 上传bin压缩目录
-      uses: actions/upload-artifact@main
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_BIN_DIR == 'true'
-      with:
-        name: OpenWrt_bin${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: bin/packages/x86_64
+      - name: Compile firmware
+        run: |
+          make -j$(nproc) || make -j1 V=s
+          echo "======================="
+          echo "Space usage:"
+          echo "======================="
+          df -h
+          echo "======================="
+          du -h ./ --max-depth=1
+          du -h /mnt/openwrt/ --max-depth=1 || true
 
-    - name: 整理编译好的固件
-      id: organize
-      if: env.UPLOAD_FIRMWARE == 'true' && !cancelled()
-      run: |
-        cd bin/targets/*/*
-        rm -rf packages && mkdir packages
-        find -name "*esxi-flat.vmdk*" | xargs -i mv -f {} packages
-        find -name "*kernel.bin*" | xargs -i mv -f {} packages
-        find -name "*rootfs*" | xargs -i mv -f {} packages
-        find -name "*.manifest*" | xargs -i mv -f {} packages
-        find -name "*vmlinuz*" | xargs -i mv -f {} packages
-        find -name "*esxi.vmdk*" | xargs -i mv -f {} packages
-        rm -rf packages
-        echo "FIRMWARE=$PWD" >> $GITHUB_ENV
-        echo "::set-output name=status::success"
-    - name: 上传固件到github
-      uses: actions/upload-artifact@main
-      if: steps.organize.outputs.status == 'success' && !cancelled()
-      with:
-        name: LEDE_5.4.86docker${{ env.DEVICE_NAME }}${{ env.FILE_DATE }}
-        path: ${{ env.FIRMWARE }}
+      - name: Prepare artifact
+        run: |
+          mkdir -p ./artifact/firmware
+          mkdir -p ./artifact/package
+          mkdir -p ./artifact/buildinfo
+          rm -rf $(find ./bin/targets/ -type d -name "packages")
+          cp -rf $(find ./bin/targets/ -type f) ./artifact/firmware/
+          cp -rf $(find ./bin/packages/ -type f -name "*.ipk") ./artifact/package/
+          cp -rf $(find ./bin/targets/ -type f -name "*.buildinfo" -o -name "*.manifest") ./artifact/buildinfo/
 
-    - name: 上传固件到NN网盘
-      id: cowtransfer
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_COWTRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer cow --block 2621440 -s -p 64 --no-progress ${FIRMWARE} 2>&1 | tee cowtransfer.log
-        echo "::warning file=cowtransfer.com::$(cat cowtransfer.log | grep https)"
-        echo "::set-output name=url::$(cat cowtransfer.log | grep https | cut -f3 -d" ")"
-    - name: 上传固件到WT网盘
-      id: wetransfer
-      if: steps.organize.outputs.status == 'success' && env.UPLOAD_WETRANSFER == 'true' && !cancelled()
-      run: |
-        curl -fsSL git.io/file-transfer | sh
-        ./transfer wet -s -p 16 --no-progress ${FIRMWARE} 2>&1 | tee wetransfer.log
-        echo "::warning file=wetransfer.com::$(cat wetransfer.log | grep https)"
-        echo "::set-output name=url::$(cat wetransfer.log | grep https | cut -f3 -d" ")"
-        
-    - name: 创建release标签
-      id: tag
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      run: |
-        echo "::set-output name=release_tag::$(date +"%Y.%m.%d-%H%M")"
-        touch release.txt
-        echo "[固件源码](https://github.com/coolsnowwolf/lede)" >> release.txt
-        echo "由衷感谢所有为openwrt无私奉献的大佬们" >> release.txt
-        echo "📥 固件下载" >> release.txt
-        [ $UPLOAD_COWTRANSFER = true ] && echo "🔗 [国内NN网盘](${{ steps.cowtransfer.outputs.url }})" >> release.txt
-        [ $UPLOAD_WETRANSFER = true ] && echo "🔗 [国外WT网盘](${{ steps.wetransfer.outputs.url }})" >> release.txt
-        echo "::set-output name=status::success"
-    - name: 发布至release
-      uses: softprops/action-gh-release@v1
-      if: steps.tag.outputs.status == 'success' && !cancelled()
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE4_TOKEN }}
-      with:
-        name: ${{ env.FILE_TIME }} 「 LEDE5.4.86docker-X86-64 」
-        tag_name: ${{ steps.tag.outputs.release_tag }}
-        body_path: release.txt
-        files: ${{ env.FIRMWARE }}/*
+      - name: Deliver buildinfo
+        uses: actions/upload-artifact@v2
+        with:
+          name: OpenWrt_buildinfo
+          path: ./artifact/buildinfo/
 
-    - name: 删除旧的Releases
-      uses: dev-drprasad/delete-older-releases@v0.1.0
-      if: env.UPLOAD_RELEASE == 'true' && !cancelled()
-      with:
-        keep_latest: 9
-        delete_tags: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.RELEASE4_TOKEN }}
+      - name: Deliver package
+        uses: actions/upload-artifact@v2
+        with:
+          name: OpenWrt_package
+          path: ./artifact/package/
 
-    - name: 微信报告
-      uses: emon100/Action-Serverchan@master
-      if: steps.organize.outputs.status == 'success' && !cancelled()
-      with:
-        SCKEY: ${{ secrets.SCKEY }}
-        text: 恭喜lede5.4.86内核docker固件编译成功！
-        desp: 我亲爱的主人您要编译的固件成功完成了！
-              
-              
-              奶牛快传：${{ steps.cowtransfer.outputs.url }}
-              
-              
-              WeTransfer：${{ steps.wetransfer.outputs.url }}
-              
-              
-              Have a nice day.
+      - name: Deliver firmware
+        uses: actions/upload-artifact@v2
+        with:
+          name: OpenWrt_firmware
+          path: ./bin/targets/
+
+      - name: Upload release asset
+        if: github.event == 'release'
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.YOURTOKEN }}
+          file: ./artifact/firmware/*
+          tag: ${{ github.ref }}
+          file_glob: true
