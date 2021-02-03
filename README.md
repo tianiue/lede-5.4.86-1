@@ -8,7 +8,7 @@ Welcome to Lean's  git source of OpenWrt and packages
 -
 1. **不**要用 **root** 用户 git 和编译！！！
 2. 国内用户编译前最好准备好梯子
-3. 默认登陆IP 192.168.1.1, 密码 password
+3. 默认登陆IP 192.168.6.1, 密码 password
 
 编译命令如下:
 -
@@ -75,14 +75,6 @@ make -j$(($(nproc) + 1)) V=s
 ## Donate
 
 如果你觉得此项目对你有帮助，可以捐助我们，以鼓励项目能持续发展，更加完善
-
-### Alipay 支付宝
-
-![alipay](doc/alipay_donate.jpg)
-
-### Wechat 微信
-
-![wechat](doc/wechat_donate.jpg)
 
 ------
 
