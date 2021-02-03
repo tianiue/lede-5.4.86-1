@@ -10,13 +10,12 @@
 name: OpenWrt_Docker5.4.86
 
 on:
-  push:
-    branches: 
-      - master
-  # schedule:
-  #   - cron: 0 20 * * *
-  release:
-    types: [published]
+  repository_dispatch:
+  workflow_dispatch:
+  #schedule:
+  #  - cron: 0 18 */3 * *
+  #release:
+    #types: [published]
 
 jobs:
 
