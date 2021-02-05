@@ -7,7 +7,7 @@
 # <https://github.com/KFERMercer/OpenWrt-CI>
 #
 
-name: OpenWrt-Tian
+name: OpenWrt-Tian5.4.86
 
 on:
   repository_dispatch:
@@ -327,7 +327,7 @@ jobs:
       - name: Deliver firmware
         uses: actions/upload-artifact@v2
         with:
-          name: OpenWrt_firmware_Tian5.4
+          name: OpenWrt_firmware_Tian5.4.86
           path: ./bin/targets/
 
       - name: Upload release asset
