@@ -63,13 +63,11 @@ jobs:
           mkdir openwrt-packages
           cd openwrt-packages
           git clone https://github.com/tianiue/luci-packages.git
-          git clone https://github.com/tianiue/openwrt-packages.git
           git clone https://github.com/xiaorouji/openwrt-passwall.git
           git clone https://github.com/fw876/helloworld.git
           git clone https://github.com/vernesong/OpenClash.git
           git clone https://github.com/frainzy1477/luci-app-clash.git
           git clone https://github.com/destan19/OpenAppFilter.git
-          git clone https://github.com/sirpdboy/luci-app-autopoweroff.git
           git clone https://github.com/jerrykuku/luci-app-ttnode.git
           git clone https://github.com/jerrykuku/luci-app-jd-dailybonus.git
           git clone https://github.com/jerrykuku/luci-app-vssr.git
