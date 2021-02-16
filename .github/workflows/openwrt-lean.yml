@@ -429,6 +429,7 @@ jobs:
           CONFIG_PACKAGE_luci-app-oaf=y
           CONFIG_PACKAGE_luci-app-syncdial=y
           CONFIG_PACKAGE_luci-app-wrtbwmon=y
+          # CONFIG_v2ray-plugin_INCLUDE_GOPROXY is not set
           EOF
 
           # LuCI主题:
