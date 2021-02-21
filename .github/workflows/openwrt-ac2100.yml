@@ -7,22 +7,21 @@
 # <https://github.com/KFERMercer/OpenWrt-CI>
 #
 
-name: OpenWrt-mini
+name: OpenWrt-AC2100
 
 on:
-  push:
-    branches: 
-      - master
-  # schedule:
-  #   - cron: 0 20 * * *
-  release:
-    types: [published]
+  repository_dispatch:
+  workflow_dispatch:
+  #schedule:
+  #  - cron: 0 18 */3 * *
+  #release:
+    #types: [published]
 
 jobs:
 
   build_openwrt:
 
-    name: Build OpenWrt firmware mini
+    name: Build OpenWrt firmware AC2100
 
     runs-on: ubuntu-latest
 
@@ -118,11 +117,12 @@ jobs:
           # 无论你想要对固件进行怎样的定制, 都需要且只需要修改 EOF 回环内的内容.
           # 
 
-          # 编译x64固件:
+          # 编译ARM固件:
           cat >> .config <<EOF
           CONFIG_TARGET_ramips=y
-          CONFIG_TARGET_ramips_mt7620=y
-          CONFIG_TARGET_ramips_mt7620_DEVICE_xiaomi_miwifi-mini=y
+          CONFIG_TARGET_ramips_mt7621=y
+          CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_redmi-router-ac2100=y
+          CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-ac2100=y
           EOF
 
           # 固件压缩:
@@ -150,21 +150,21 @@ jobs:
 
           # WiFi网卡驱动:
           cat >> .config <<EOF
-          CONFIG_DEFAULT_kmod-mt76x2=y
+          CONFIG_DEFAULT_kmod-mt7603e=y
+          CONFIG_DEFAULT_kmod-mt7615d=y
           EOF
 
           # USB设备支持:
           cat >> .config <<EOF
-          CONFIG_PACKAGE_kmod-usb-core=y
-          CONFIG_PACKAGE_kmod-usb-ehci=y
-          CONFIG_PACKAGE_kmod-usb-ohci=y
+          # CONFIG_PACKAGE_kmod-usb-ehci=y
+          # CONFIG_PACKAGE_kmod-usb-ohci=y
           # CONFIG_PACKAGE_kmod-usb-ohci-pci=y
           # CONFIG_PACKAGE_kmod-usb-uhci=y
           # CONFIG_PACKAGE_kmod-usb-wdm=y
           # CONFIG_PACKAGE_kmod-usb-net-pl=y
           # CONFIG_PACKAGE_kmod-usb-serial=y
           # CONFIG_PACKAGE_kmod-usb-printer=y
-          CONFIG_PACKAGE_kmod-usb2=y
+          # CONFIG_PACKAGE_kmod-usb2=y
           # CONFIG_PACKAGE_kmod-usb2-pci=y
           # CONFIG_PACKAGE_kmod-usb3=y
           EOF
@@ -175,7 +175,7 @@ jobs:
           # CONFIG_PACKAGE_luci-app-netdata-zh=y
           CONFIG_PACKAGE_luci-app-webadmin=y
           CONFIG_PACKAGE_luci-app-ttyd=y
-          CONFIG_PACKAGE_luci-app-diskman=y
+          # CONFIG_PACKAGE_luci-app-diskman=y
           CONFIG_PACKAGE_luci-app-autoreboot=n
           CONFIG_PACKAGE_luci-app-autopoweroff=y
           # CONFIG_PACKAGE_luci-app-vssr=y
@@ -194,10 +194,9 @@ jobs:
           # CONFIG_PACKAGE_luci-app-oscam=y
           # CONFIG_PACKAGE_oscam=y
           # CONFIG_PACKAGE_luci-app-serverchan=y
-          CONFIG_PACKAGE_luci-app-uugamebooster=y
           CONFIG_PACKAGE_luci-app-udpxy=y
           # CONFIG_PACKAGE_luci-app-frpc=y
-          # CONFIG_PACKAGE_luci-app-uhttpd=y
+          CONFIG_PACKAGE_luci-app-uhttpd=y
           CONFIG_PACKAGE_luci-app-xlnetacc=n
           # CONFIG_PACKAGE_luci-app-nps=y
           # CONFIG_PACKAGE_luci-lib-docker=y
@@ -326,7 +325,7 @@ jobs:
       - name: Deliver firmware
         uses: actions/upload-artifact@v2
         with:
-          name: OpenWrt_firmware_mini
+          name: OpenWrt_firmware_AC2100
           path: ./bin/targets/
 
       - name: Upload release asset
