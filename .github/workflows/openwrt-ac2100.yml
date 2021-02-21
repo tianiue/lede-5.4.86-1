@@ -123,7 +123,7 @@ jobs:
           CONFIG_TARGET_ramips=y
           CONFIG_TARGET_ramips_mt7621=y
           CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_redmi-router-ac2100=y
-          CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-ac2100=y
+          # CONFIG_TARGET_ramips_mt7621_DEVICE_xiaomi_mi-router-ac2100=y
           EOF
 
           # 固件压缩:
@@ -237,6 +237,7 @@ jobs:
           cat >> .config <<EOF
           CONFIG_PACKAGE_curl=y
           CONFIG_PACKAGE_htop=y
+          CONFIG_PACKAGE_iperf3=y
           CONFIG_PACKAGE_nano=y
           CONFIG_PACKAGE_screen=y
           CONFIG_PACKAGE_tree=y
