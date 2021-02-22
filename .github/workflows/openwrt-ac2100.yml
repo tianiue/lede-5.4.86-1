@@ -195,6 +195,8 @@ jobs:
           # CONFIG_PACKAGE_luci-app-oscam=y
           # CONFIG_PACKAGE_oscam=y
           # CONFIG_PACKAGE_luci-app-serverchan=y
+          CONFIG_PACKAGE_UnblockNeteaseMusic=y
+          CONFIG_PACKAGE_UnblockNeteaseMusicGo=y
           CONFIG_PACKAGE_luci-app-udpxy=y
           # CONFIG_PACKAGE_luci-app-frpc=y
           CONFIG_PACKAGE_luci-app-uhttpd=y
