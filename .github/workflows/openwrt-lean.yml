@@ -241,9 +241,6 @@ jobs:
           cat >> .config <<EOF
           CONFIG_PACKAGE_kmod-adm8211=y
           CONFIG_PACKAGE_kmod-ar5523=y
-          CONFIG_PACKAGE_kmod-ath10k-ct=y
-          CONFIG_PACKAGE_kmod-ath10k-ct-smallbuffers=y
-          CONFIG_PACKAGE_kmod-ath6kl-sdio=y
           CONFIG_PACKAGE_kmod-ath6kl-usb=y
           CONFIG_PACKAGE_kmod-b43=y
           CONFIG_PACKAGE_kmod-b43legacy=y
@@ -265,8 +262,6 @@ jobs:
           CONFIG_PACKAGE_kmod-lib-cordic=y
           CONFIG_PACKAGE_kmod-lib-crc8=y
           CONFIG_PACKAGE_kmod-lib80211=y
-          CONFIG_PACKAGE_kmod-libertas-sdio=y
-          CONFIG_PACKAGE_kmod-libertas-spi=y
           CONFIG_PACKAGE_kmod-libertas-usb=y
           CONFIG_PACKAGE_kmod-libipw=y
           CONFIG_PACKAGE_kmod-mac80211-hwsim=y
@@ -285,7 +280,6 @@ jobs:
           CONFIG_PACKAGE_kmod-mt76x2u=y
           CONFIG_PACKAGE_kmod-mt7915e=y
           CONFIG_PACKAGE_kmod-mwifiex-pcie=y
-          CONFIG_PACKAGE_kmod-mwifiex-sdio=y
           CONFIG_PACKAGE_kmod-mwl8k=y
           CONFIG_PACKAGE_kmod-net-prism54=y
           CONFIG_PACKAGE_kmod-net-rtl8192su=y
@@ -294,7 +288,6 @@ jobs:
           CONFIG_PACKAGE_kmod-p54-pci=y
           CONFIG_PACKAGE_kmod-p54-usb=y
           CONFIG_PACKAGE_kmod-rsi91x=y
-          CONFIG_PACKAGE_kmod-rsi91x-sdio=y
           CONFIG_PACKAGE_kmod-rsi91x-usb=y
           CONFIG_PACKAGE_kmod-rt2400-pci=y
           CONFIG_PACKAGE_kmod-rt2500-pci=y
