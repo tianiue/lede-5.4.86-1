@@ -10,12 +10,11 @@
 name: OpenWrt-Tian5.4.86
 
 on:
-  repository_dispatch:
   workflow_dispatch:
-  #schedule:
-  #  - cron: 0 18 */3 * *
-  #release:
-    #types: [published]
+  # schedule:
+  #   - cron: 0 22 5 * *
+  # release:
+    # types: [published]
 
 jobs:
 
