@@ -161,7 +161,7 @@ jobs:
           # CONFIG_PACKAGE_kmod-usb-wdm=y
           CONFIG_PACKAGE_kmod-usb2=y
           # CONFIG_PACKAGE_kmod-usb2-pci=y
-          CONFIG_PACKAGE_kmod-usb3=y
+          # CONFIG_PACKAGE_kmod-usb3=y
           EOF
 
           # WiFi网卡驱动:
@@ -239,7 +239,7 @@ jobs:
           cat >> .config <<EOF
           CONFIG_PACKAGE_curl=y
           CONFIG_PACKAGE_htop=y
-          CONFIG_PACKAGE_iperf3=y
+          # CONFIG_PACKAGE_iperf3=y
           CONFIG_PACKAGE_nano=y
           CONFIG_PACKAGE_screen=y
           CONFIG_PACKAGE_tree=y
